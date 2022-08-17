@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+
 	fmt.Println("start")
 
 	err := godotenv.Load()
@@ -26,7 +27,7 @@ func main() {
 	ctx := context.Background()
 	srv, err := NewSpreadSheetService(ctx, spreadSheetId)
 
-	ss, err := srv.Spreadsheets.Get(spreadSheetId).Do()
+	ss, err := srv.Spreadsheets.Get(spreadSheetId).Context(ctx).Do()
 	if err != nil {
 		log.Fatalf("Unable to get spread sheet: %v", err)
 	}
