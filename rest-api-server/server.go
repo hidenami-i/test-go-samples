@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"net"
 	"net/http"
+	"time"
 )
 
 type UserEntity struct {
@@ -15,11 +17,34 @@ type UserEntity struct {
 
 func main() {
 	router := chi.NewRouter()
+
 	router.Use(middleware.Logger)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.Timeout(60 * time.Second))
+
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		MyRequestHandler(w, r)
 	})
-	err := http.ListenAndServe(":3000", router)
+
+	srv := &http.Server{
+		Addr:              net.JoinHostPort("localhost", "3000"),
+		Handler:           router,
+		TLSConfig:         nil,
+		ReadTimeout:       0,
+		ReadHeaderTimeout: 0,
+		WriteTimeout:      0,
+		IdleTimeout:       0,
+		MaxHeaderBytes:    0,
+		TLSNextProto:      nil,
+		ConnState:         nil,
+		ErrorLog:          nil,
+		BaseContext:       nil,
+		ConnContext:       nil,
+	}
+
+	err := srv.ListenAndServe()
 	if err != nil {
 		return
 	}
