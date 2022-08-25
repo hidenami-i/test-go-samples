@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net"
@@ -46,6 +47,7 @@ func main() {
 
 	err := srv.ListenAndServe()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 }
@@ -54,6 +56,10 @@ func MyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	// here we read from the request context and fetch out `"user"` key set in
 	// the MyMiddleware example above.
 	//user := r.Context().Value("user").(string)
+
+	id := middleware.GetReqID(r.Context())
+	fmt.Println(fmt.Sprintf("request id: %s", id))
+	fmt.Println(fmt.Sprintf("real ip: %s", r.RemoteAddr)) // middleware.RealIP
 
 	// respond to the client
 	//w.Write([]byte(fmt.Sprintf("hi %s", user)))
